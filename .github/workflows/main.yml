@@ -1,0 +1,26 @@
+name: 自动监控马斯克
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # 每5分钟自动执行一次
+  workflow_dispatch:      # 允许手动随时点击运行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查代码
+        uses: actions/checkout@v3
+
+      - name: 安装 Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 安装必要工具
+        run: pip install feedparser requests
+
+      - name: 执行监控脚本
+        env:
+          WECHAT_KEY: ${{ secrets.WECHAT_KEY }}
+        run: python monitor.py
