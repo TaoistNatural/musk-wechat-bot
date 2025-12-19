@@ -1,0 +1,28 @@
+Name: 自动监控马斯克
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'  # 建议改为每10分钟（Github Actions有时候会有延迟，太频繁容易漏）
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查代码
+        uses: actions/checkout@v3
+
+      - name: 安装 Python 环境
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: 安装依赖库
+        # ⚠️ 必须安装 googletrans 4.0.0-rc1 版本
+        run: pip install feedparser requests googletrans==4.0.0-rc1
+
+      - name: 执行监控脚本
+        env:
+          # 在 GitHub 仓库 Settings -> Secrets 中添加 WECHAT_KEY
+          WECHAT_KEY: ${{ secrets.WECHAT_KEY }}
+        run: python monitor.py
